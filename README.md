@@ -67,8 +67,3 @@ You should now see the latest value in the box and see the data in the chart.
 ```
 
 
-
-
-
-
-
