@@ -1,7 +1,7 @@
 # webMqtt
 Example of using mosquitto with websockets, and SmoothieCharts
 
-'''
+```
 cd /tmp
 ## Download and extract mosquitto
 wget http://mosquitto.org/files/source/mosquitto-1.4.14.tar.gz
@@ -64,7 +64,8 @@ sudo apt-get install lighttpd
 In browser goto 'http://localhost:9002/webmqtt.html'.
 
 You should now see the latest value in the box and see the data in the chart.
-'''
+```
+
 
 
 
