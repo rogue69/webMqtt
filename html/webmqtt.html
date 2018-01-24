@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <script type="text/javascript" src="paho-mqtt.js"></script>
+  <script type="text/javascript" src="smoothie.js"></script>
+
+<script type="text/javascript">
+var mqttPort = 1884;
+
+var client;
+
+// called when the client connects
+function onConnect() 
+{
+  // Once a connection has been made, make a subscription and send a message.
+  console.log("onConnect");
+  client.subscribe("World");
+  message = new Paho.MQTT.Message("Hello");
+  message.destinationName = "World";
+  client.send(message);
+}
+
+// called when the client loses its connection
+function onConnectionLost(responseObject) 
+{
+  if (responseObject.errorCode !== 0) 
+  {
+    console.log("onConnectionLost:"+responseObject.errorMessage);
+  }
+}
+
+// called when a message arrives
+function onMessageArrived(message) 
+{
+  console.log("onMessageArrived:" + message.payloadString);
+
+  var elem = document.getElementById("value");
+  if (isNaN(message.payloadString))
+  {
+    elem.value = "ERROR";
+  }
+  else
+  {
+    var value = parseFloat(message.payloadString);
+    elem.value = value;
+    readings.append(new Date().getTime(), value);
+  }
+}
+
+
+var readings = new TimeSeries();
+var timestamp = 0.0;
+
+function createTimeline() 
+{
+  var chart = new SmoothieChart(
+    {
+  grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
+          lineWidth: 1, millisPerLine: 250, verticalSections: 6, },
+  labels: { fillStyle:'rgb(60, 0, 0)' },
+      interpolation:'bezier',
+      minValue:0.0,
+      maxValue:255
+    });
+  chart.addTimeSeries(readings, 
+    { strokeStyle:'rgb(0, 255, 0)', fillStyle:'rgba(0, 255, 0, 0.4)', lineWidth:3 }
+    //{ strokeStyle: 'rgba(0, 255, 0, 0.6)', fillStyle: 'rgba(0, 0, 255, 0.2)', lineWidth: 3 }
+    );
+//  chart.streamTo(document.getElementById("chart"), 500);
+//  var chart = new SmoothieChart();
+  chart.streamTo(document.getElementById("chart"), 500);
+//  chart.addTimeSeries(readings);
+}
+
+
+function init()
+{
+  try
+  {
+    createTimeline();
+
+    // Create a client instance
+    client = new Paho.MQTT.Client(location.hostname, Number(mqttPort)
+      , "mqttWeb");
+
+    // set callback handlers
+    client.onConnectionLost = onConnectionLost;
+    client.onMessageArrived = onMessageArrived;
+
+    // connect the client
+    client.connect({onSuccess:onConnect});
+  }
+  catch (err)
+  {
+    console.log("ERROR: " + err.message);
+  }
+}
+
+</script>
+</head>
+
+<body onload="init(); return true">
+MQTT test page <br>
+
+<input id="value" width="20"></input>
+<canvas id="chart" width="800" height="400"></canvas>
+</body>
+
+</html>
+
+
