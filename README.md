@@ -1,5 +1,5 @@
 # webMqtt
-Example of using mosquitto with websockets, and SmoothieCharts
+##Example of using mosquitto with websockets, and SmoothieCharts##
 
 ```
 cd /tmp
